@@ -1,7 +1,7 @@
 Package.describe({
   name: "zeroasterisk:ll-util",
   summary: "Utilities for Latitude and Longitude",
-  version: "0.0.1",
+  version: "0.0.2",
   git: "https://github.com/zeroasterisk/Meteor-ll-util.git"
 });
 

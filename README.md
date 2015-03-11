@@ -3,6 +3,19 @@
 There are many other, more rhobust LatLon tools out there... but if you want
 VERY simple utilites with a small footprint, this is a good option.
 
+## Thanks!
+
+This is a smaller/simpler (and less featured) implementation of:
+http://www.movable-type.co.uk/scripts/latlong.html
+
+Which can be found here:
+https://github.com/chrisveness/geodesy
+
+Do you need more functionality?
+
+You could switch to the Meteor packaged version of above: `garrilla:geodesy-libraries`
+https://github.com/garrilla/geodesy-libraries-for-Meteor
+
 ### Install
 
 ```

@@ -1,22 +1,32 @@
 /**
  * Utilities for Lat and Lng
  *
- */
-
-/**
- * A helper function destinationPoint() which allows you to
- * calulate a new LatLng (for a marker.position) from any given LatLng
+ * This is a smaller/simpler (and less featured) implementation of:
+ * @link http://www.movable-type.co.uk/scripts/latlong.html
+ *   ^ that is the bomb!
  *
- * Example via destinationPoint():
+ * Example usage:
  *
+ *   the distance between 2 points
+ *   var km = LL.getDistance(
+ *     {lat: x, lng: x},
+ *     {lat: y, lng: y}
+ *   );
  *
- * Example via google.maps.LatLng:
+ *   the bearing between 2 points
+ *   var brng = LL.getBearing(
+ *     {lat: x, lng: x},
+ *     {lat: y, lng: y}
+ *   );
  *
- *   var pointA = new google.maps.LatLng(25.48, -71.26);
- *   var radiusInKm = 10;
- *   var pointB = pointA.destinationPoint(90, radiusInKm);
+ *   the desination point along a bearing, traveling for a distance
+ *   var dest = LL.getDestination(
+ *     {lat: x, lng: x},
+ *     brng,
+ *     km
+ *   );
+ *   dest == {lat: y, lng: y}
  *
- * @link http://stackoverflow.com/questions/2637023/how-to-calculate-the-latlng-of-a-point-a-certain-distance-away-from-another
  */
 Number.prototype.toRad = function() {
   return this * Math.PI / 180;
@@ -51,9 +61,9 @@ LL = {
   getDestination: function(from, brng, km) {
     from = _.extend({lat: 0, lng: 0}, from);
     var km = km / this.R,
-    brng = brng.toRad(),
-    lat1 = from.lat.toRad(),
-    lng1 = from.lng.toRad();
+      brng = brng.toRad(),
+      lat1 = from.lat.toRad(),
+      lng1 = from.lng.toRad();
 
     var lat2 = Math.asin(
       Math.sin(lat1) * Math.cos(km) +
@@ -64,6 +74,9 @@ LL = {
       Math.sin(brng) * Math.sin(km) * Math.cos(lat1),
       Math.cos(km) - Math.sin(lat1) * Math.sin(lat2)
     );
+
+    // normalise to -180..+180°
+    lng2 = (lng2+3*Math.PI) % (2*Math.PI) - Math.PI;
 
     if (isNaN(lat2) || isNaN(lng2)) return null;
 
@@ -111,12 +124,17 @@ LL = {
    * @return number bearing The bearing between 0 and 360
    */
   getBearing: function(from, to) {
-    var dLon = (from.lng - to.lng).toRad();
-    var y = Math.sin(dLon) * Math.cos(to.lat);
-    var x = Math.cos(from.lat.toRad()) * Math.sin(to.lat.toRad()) -
-      Math.sin(from.lat.toRad()) * Math.cos(to.lat.toRad()) * Math.cos(dLon);
+    var lat1 = from.lat.toRad(),
+      lat2 = to.lat.toRad();
+    var lngDiff = (to.lng-from.lng).toRad();
+
+    // see http://mathforum.org/library/drmath/view/55417.html
+    var y = Math.sin(lngDiff) * Math.cos(lat2);
+    var x = Math.cos(lat1)*Math.sin(lat2) -
+      Math.sin(lat1)*Math.cos(lat2)*Math.cos(lngDiff);
     var brng = Math.atan2(y, x);
-    return 360 - ((brng.toDeg() + 360) % 360);
+
+    return (brng.toDeg()+360) % 360;
   }
 
 };
